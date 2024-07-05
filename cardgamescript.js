@@ -78,7 +78,7 @@ $(document).ready(function() {
 
           firstCard = null;
           secondCard = null;
-        }, 1000);
+        }, 500);
       }
     }
   }
