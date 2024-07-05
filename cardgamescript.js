@@ -1,86 +1,85 @@
-const gameContainer = document.getElementById('gameContainer');
-const message = document.getElementById('message');
-const startButton = document.getElementById('startButton');
+$(document).ready(function() {
+  const $gameContainer = $('#gameContainer');
+  const $message = $('#message');
+  const $startButton = $('#startButton');
 
-const cardsArray = [
-  'A', 'A', 'B', 'B', 'C', 'C', 'D', 'D', 'E', 'E', 'F', 'F'
-];
+  const cardsArray = [
+    'A', 'A', 'B', 'B', 'C', 'C', 'D', 'D', 'E', 'E', 'F', 'F'
+  ];
 
-let cards = [];
-let firstCard = null;
-let secondCard = null;
-let matches = 0;
-let attempts = 0;
+  let cards = [];
+  let firstCard = null;
+  let secondCard = null;
+  let matches = 0;
+  let attempts = 0;
 
-startButton.addEventListener('click', startGame);
+  $startButton.on('click', startGame);
 
-function startGame() {
-  message.textContent = '';
-  gameContainer.innerHTML = '';
-  matches = 0;
-  attempts = 0;
-  firstCard = null;
-  secondCard = null;
+  function startGame() {
+    $message.text('');
+    $gameContainer.empty();
+    matches = 0;
+    attempts = 0;
+    firstCard = null;
+    secondCard = null;
 
-  // Shuffle cards
-  cards = shuffle(cardsArray);
+    // Shuffle cards
+    cards = shuffle(cardsArray);
 
-  // Display cards
-  cards.forEach((card, index) => {
-    const cardElement = document.createElement('div');
-    cardElement.classList.add('card');
-    cardElement.dataset.value = card;
-    cardElement.dataset.index = index;
-    cardElement.addEventListener('click', handleCardClick);
-    gameContainer.appendChild(cardElement);
-  });
-}
-
-function shuffle(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-}
-
-function handleCardClick(event) {
-  const clickedCard = event.target;
-
-  if (clickedCard.classList.contains('matched') || clickedCard === firstCard || clickedCard === secondCard) {
-    return;
+    // Display cards
+    cards.forEach((card, index) => {
+      const $cardElement = $('<div></div>')
+        .addClass('card')
+        .data('value', card)
+        .data('index', index)
+        .on('click', handleCardClick);
+      $gameContainer.append($cardElement);
+    });
   }
 
-  clickedCard.textContent = clickedCard.dataset.value;
-  clickedCard.classList.add('hidden');
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
 
-  if (!firstCard) {
-    firstCard = clickedCard;
-  } else if (!secondCard) {
-    secondCard = clickedCard;
-    attempts++;
+  function handleCardClick() {
+    const $clickedCard = $(this);
 
-    if (firstCard.dataset.value === secondCard.dataset.value) {
-      firstCard.classList.add('matched');
-      secondCard.classList.add('matched');
-      matches++;
+    if ($clickedCard.hasClass('matched') || $clickedCard.is(firstCard) || $clickedCard.is(secondCard)) {
+      return;
+    }
 
-      firstCard = null;
-      secondCard = null;
+    $clickedCard.text($clickedCard.data('value')).addClass('hidden');
 
-      if (matches === cardsArray.length / 2) {
-        message.textContent = `You won in ${attempts} attempts!`;
-      }
-    } else {
-      setTimeout(() => {
-        firstCard.textContent = '';
-        firstCard.classList.remove('hidden');
-        secondCard.textContent = '';
-        secondCard.classList.remove('hidden');
+    if (!firstCard) {
+      firstCard = $clickedCard;
+    } else if (!secondCard) {
+      secondCard = $clickedCard;
+      attempts++;
+
+      if (firstCard.data('value') === secondCard.data('value')) {
+        firstCard.addClass('matched');
+        secondCard.addClass('matched');
+        matches++;
 
         firstCard = null;
         secondCard = null;
-      }, 1000);
+
+        if (matches === cardsArray.length / 2) {
+          $message.text(`You won in ${attempts} attempts!`);
+        }
+      } else {
+        setTimeout(() => {
+          firstCard.text('').removeClass('hidden');
+          secondCard.text('').removeClass('hidden');
+
+          firstCard = null;
+          secondCard = null;
+        }, 1000);
+      }
     }
   }
-}
+});
